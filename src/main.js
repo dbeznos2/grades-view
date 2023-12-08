@@ -11,6 +11,11 @@ export function addSem() {
 
     divSem.appendChild(templateSem)
 
+    let sem = divSem.lastElementChild;
+
+    let semName = sem.querySelector("dt")
+    semName.innerText = "Semestre " + amountSemesters;
+
 }
 
 addSem()
