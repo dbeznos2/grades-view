@@ -112,8 +112,29 @@ function calculateSemesterAverage(semestre) {
 
   const average = count === 0 ? 0 : total / count;
 
-  // Update the average inside the #Moyenne span
-  semestre.querySelector("#Moyenne").textContent = average.toFixed(1);
+  const moyenneSpan = semestre.querySelector("#Moyenne");
+
+  let templateDot;
+  if (average < 4) {
+    templateDot = document
+      .querySelector("#red-dot-svg")
+      .content.cloneNode(true);
+  } else if (average > 4) {
+    templateDot = document
+      .querySelector("#green-dot-svg")
+      .content.cloneNode(true);
+  } else {
+    templateDot = document
+      .querySelector("#orange-dot-svg")
+      .content.cloneNode(true);
+  }
+
+  const dot = templateDot.querySelector("svg");
+  moyenneSpan.innerHTML = "";
+  moyenneSpan.appendChild(dot);
+
+  const averageText = document.createTextNode(average.toFixed(1));
+  moyenneSpan.appendChild(averageText);
 }
 
 addSemester();
