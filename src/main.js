@@ -1,8 +1,11 @@
 let amountSemesters = 0;
-let amountAverage = 0;
 
-export function addSem() {
-  console.log("function called");
+function addSemester() {
+  if (amountSemesters >= 8) {
+    alert("You can't add more than 8 semesters.");
+    return;
+  }
+
   amountSemesters++;
 
   let templateSem = document
@@ -14,29 +17,56 @@ export function addSem() {
   divSem.appendChild(templateSem);
 
   let sem = divSem.lastElementChild;
+  setupSemester(sem);
+}
 
+function setupSemester(sem) {
   let semName = sem.querySelector("dt");
   semName.innerText = "Semester " + amountSemesters;
 
   let addNote = sem.querySelector("button");
   let noteInput = sem.querySelector("input");
 
-  addNote.addEventListener("click", function (event) {
-    nouvelleNote(noteInput.value, sem);
-    noteInput.value = "";
-  });
+  addNote.addEventListener(
+    "click",
+    handleAddNoteClick.bind(null, sem, noteInput),
+  );
+  noteInput.addEventListener(
+    "keydown",
+    handleNoteInputKeydown.bind(null, sem, noteInput),
+  );
+}
 
-  noteInput.addEventListener("keydown", function (event) {
-    if (event.key === "Enter") {
-      nouvelleNote(noteInput.value, sem);
+function handleAddNoteClick(sem, noteInput, event) {
+  const noteValue = validateNoteInput(noteInput.value);
+  if (noteValue !== null) {
+    nouvelleNote(noteValue, sem);
+    noteInput.value = "";
+    calculateSemesterAverage(sem);
+  }
+}
+
+function handleNoteInputKeydown(sem, noteInput, event) {
+  if (event.key === "Enter") {
+    const noteValue = validateNoteInput(noteInput.value);
+    if (noteValue !== null) {
+      nouvelleNote(noteValue, sem);
       noteInput.value = "";
+      calculateSemesterAverage(sem);
     }
-  });
+  }
+}
+
+function validateNoteInput(value) {
+  const noteValue = parseFloat(value);
+  if (isNaN(noteValue) || noteValue < 1 || noteValue > 6) {
+    alert("Please enter a valid grade between 1 and 6.");
+    return null;
+  }
+  return noteValue;
 }
 
 function nouvelleNote(note, semestre) {
-  console.log(note);
-
   let noteStock = semestre.querySelector("dd > div");
 
   let templateDot;
@@ -61,18 +91,37 @@ function nouvelleNote(note, semestre) {
   let span = templateNote.querySelector("span");
   span.textContent = note;
 
-  // Add the dot directly within the span without changing HTML
   let dot = templateDot.querySelector("svg");
   span.insertBefore(dot, span.firstChild);
 
   noteStock.appendChild(templateNote);
 }
 
-addSem();
+function calculateSemesterAverage(semestre) {
+  let allNotes = semestre.querySelectorAll("dd > div:first-child > span");
+  let total = 0;
+  let count = 0;
+
+  allNotes.forEach((note) => {
+    const noteValue = parseFloat(note.textContent);
+    if (!isNaN(noteValue) && noteValue >= 1 && noteValue <= 6) {
+      total += noteValue;
+      count++;
+    }
+  });
+
+  const average = count === 0 ? 0 : total / count;
+
+  // Update the average inside the #Moyenne span
+  semestre.querySelector("#Moyenne").textContent = average.toFixed(1);
+}
+
+addSemester();
+addSemester();
 
 let addSemButton = document.querySelector("#add_sem");
 addSemButton.addEventListener("click", function (event) {
   if (amountSemesters < 8) {
-    addSem();
+    addSemester();
   }
 });
