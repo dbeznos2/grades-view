@@ -22,7 +22,7 @@ function addSemester() {
 
 function setupSemester(sem) {
   let semName = sem.querySelector("dt");
-  semName.innerText = "Semester " + amountSemesters;
+  semName.innerText = `Semester ${amountSemesters}`;
 
   let addNote = sem.querySelector("button");
   let noteInput = sem.querySelector("input");
@@ -69,24 +69,8 @@ function validateNoteInput(value) {
 function nouvelleNote(note, semester) {
   let noteStock = semester.querySelector("dd > div");
 
-  let templateDot;
-  if (note < 4) {
-    templateDot = document
-      .querySelector("#red-dot-svg")
-      .content.cloneNode(true);
-  } else if (note > 4) {
-    templateDot = document
-      .querySelector("#green-dot-svg")
-      .content.cloneNode(true);
-  } else {
-    templateDot = document
-      .querySelector("#orange-dot-svg")
-      .content.cloneNode(true);
-  }
-
-  let templateNote = document
-    .querySelector("#noteSpan")
-    .content.cloneNode(true);
+  let templateDot = createTemplateClone(`#${selectDotColor(note)}-dot-svg`);
+  let templateNote = createTemplateClone("#noteSpan");
 
   let span = templateNote.querySelector("span");
   span.textContent = note;
@@ -114,29 +98,24 @@ function calculateSemesterAverage(semester) {
 
   const moyenneSpan = semester.querySelector(".Moyenne");
 
-  let templateDot;
-  if (average < 4) {
-    templateDot = document
-      .querySelector("#red-dot-svg")
-      .content.cloneNode(true);
-  } else if (average > 4) {
-    templateDot = document
-      .querySelector("#green-dot-svg")
-      .content.cloneNode(true);
-  } else {
-    templateDot = document
-      .querySelector("#orange-dot-svg")
-      .content.cloneNode(true);
-  }
+  let templateDot = createTemplateClone(`#${selectDotColor(average)}-dot-svg`);
 
   const dot = templateDot.querySelector("svg");
-  moyenneSpan.innerHTML = "";
+  moyenneSpan.textContent = "";
   moyenneSpan.appendChild(dot);
 
-  const averageText = document.createTextNode(average.toFixed(1));
+  const averageText = document.createTextNode(rounded(average, 0.5));
   moyenneSpan.appendChild(averageText);
 
   generalAverage();
+}
+
+function createTemplateClone(selector) {
+  return document.querySelector(selector).content.cloneNode(true);
+}
+
+function rounded(num, pre) {
+  return Math.round(num / pre) * pre;
 }
 
 function generalAverage() {
@@ -156,9 +135,18 @@ function generalAverage() {
 
   const globalAverage = document.querySelector("#globalAverage");
 
-  globalAverage.innerHTML = "";
+  globalAverage.textContent = "";
 
-  const overallAverageText = document.createTextNode(overallAverage.toFixed(1));
+  let templateDot = createTemplateClone(
+    `#${selectDotColor(overallAverage)}-dot-svg`,
+  );
+
+  const dot = templateDot.querySelector("svg");
+  globalAverage.appendChild(dot);
+
+  const overallAverageText = document.createTextNode(
+    rounded(overallAverage, 0.5),
+  );
   globalAverage.appendChild(overallAverageText);
 }
 
@@ -169,5 +157,11 @@ addSemButton.addEventListener("click", function (event) {
   }
 });
 
-addSemester();
-addSemester();
+/*
+simplifying dots
+*/
+function selectDotColor(value) {
+  if (value < 4) return "red";
+  if (value > 4) return "green";
+  return "orange";
+}
