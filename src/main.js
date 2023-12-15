@@ -66,8 +66,8 @@ function validateNoteInput(value) {
   return noteValue;
 }
 
-function nouvelleNote(note, semestre) {
-  let noteStock = semestre.querySelector("dd > div");
+function nouvelleNote(note, semester) {
+  let noteStock = semester.querySelector("dd > div");
 
   let templateDot;
   if (note < 4) {
@@ -97,8 +97,8 @@ function nouvelleNote(note, semestre) {
   noteStock.appendChild(templateNote);
 }
 
-function calculateSemesterAverage(semestre) {
-  let allNotes = semestre.querySelectorAll("dd > div:first-child > span");
+function calculateSemesterAverage(semester) {
+  let allNotes = semester.querySelectorAll("dd > div:first-child > span");
   let total = 0;
   let count = 0;
 
@@ -112,7 +112,7 @@ function calculateSemesterAverage(semestre) {
 
   const average = count === 0 ? 0 : total / count;
 
-  const moyenneSpan = semestre.querySelector("#Moyenne");
+  const moyenneSpan = semester.querySelector(".Moyenne");
 
   let templateDot;
   if (average < 4) {
@@ -135,10 +135,32 @@ function calculateSemesterAverage(semestre) {
 
   const averageText = document.createTextNode(average.toFixed(1));
   moyenneSpan.appendChild(averageText);
+
+  generalAverage();
 }
 
-addSemester();
-addSemester();
+function generalAverage() {
+  let allSemAverage = document.querySelectorAll(".div_sem .Moyenne");
+  let gradesTotal = 0;
+  let semesterTotal = 0;
+
+  allSemAverage.forEach((e) => {
+    const note = Number(e.textContent);
+    if (note > 0) {
+      gradesTotal += note;
+      semesterTotal++;
+    }
+  });
+
+  const overallAverage = semesterTotal > 0 ? gradesTotal / semesterTotal : 0;
+
+  const globalAverage = document.querySelector("#globalAverage");
+
+  globalAverage.innerHTML = "";
+
+  const overallAverageText = document.createTextNode(overallAverage.toFixed(1));
+  globalAverage.appendChild(overallAverageText);
+}
 
 let addSemButton = document.querySelector("#add_sem");
 addSemButton.addEventListener("click", function (event) {
@@ -146,3 +168,6 @@ addSemButton.addEventListener("click", function (event) {
     addSemester();
   }
 });
+
+addSemester();
+addSemester();
